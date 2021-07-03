@@ -1,0 +1,77 @@
+@model IEnumerable<cet322finaltodo.Models.TodoItem>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+
+
+            <th>
+                @Html.DisplayNameFor(model => model.DueDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CompletedDate)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Category)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+
+
+            @if (item.IsCompleted)
+            {
+
+        <tr>
+            <td>
+
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+
+
+            <td>
+                @Html.DisplayFor(modelItem => item.DueDate)
+            </td>
+            <td>
+                @if (item.CompletedDate > item.DueDate) {
+
+                <a style="color:red;">@Html.DisplayFor(modelItem => item.CompletedDate)</a>
+                }else{
+                <a style="color:green;">@Html.DisplayFor(modelItem => item.CompletedDate)</a>
+                }
+                 
+            </td>
+           
+            <td>
+                @Html.DisplayFor(modelItem => item.Category.Name)
+            </td>
+            <td>
+
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                @if (item.CompletedDate > item.DueDate)
+                {<a style="color:red;"> (LATE) </a>}
+
+            </td>
+        </tr>
+    }
+
+
+        }
+    </tbody>
+</table>
