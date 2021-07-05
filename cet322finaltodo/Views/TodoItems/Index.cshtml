@@ -21,15 +21,30 @@
                 <div class="col-sm-7">
                     <label asp-for="SearchText" class="control-label"></label>
                     <input asp-for="SearchText" class="form-control" />
+
                 </div>
                 <div class="col-sm-3">
                     <label asp-for="ShowAll" class="control-label"></label>
                     <input asp-for="ShowAll" class="form-control" />
                 </div>
+                <div class="col-sm-3">
+                    <label asp-for="ShowDescription" class="control-label"></label>
+                    <input asp-for="ShowDescription" class="form-control" />
+                </div>
             </div>
+            
             <div class="form-group">
                 <input type="submit" value="Search" class="btn btn-primary" />
             </div>
+
+            <table class="table">
+                <tr>
+                    <th style="background-color:blue"> DONE </th>
+                    <th style="background-color:lightblue"> ON GOING </th>
+                    <th style="background-color:red"> LATE </th>
+                    <th style="background-color:orange"> LAST DAY </th>
+                </tr>
+            </table>
         </div>
 
 
@@ -41,72 +56,212 @@
     </form>
 </div>
 
-    <table class="table">
-        <thead>
+<table class="table">
+    <thead>
 
-            <tr>
-                <th>
-                    Crew
-                </th>
-                <th>
-                    Title
-                </th>
-
-
-                <th>
-                    Due Date
-                </th>
-                <th>
-                    Remaining Hour
-                </th>
-                <th>
-                    Is Completed?
-                </th>
-
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.Result)
-            {
-<tr>
-    <td>
-
-        @Html.DisplayFor(modelItem => item.Category.Name)
+        <tr>
+            <th>
+                Crew
+            </th>
+            <th>
+                Title
+            </th>
 
 
-    </td>
-    <td>
-        @if (item.IsCompleted)
-        {<del>@Html.DisplayFor(modelItem => item.Title)</del>}
-        @if (!item.IsCompleted)
-        {@Html.DisplayFor(modelItem => item.Title)}
+            <th>
+                Due Date
+            </th>
+            <th>
+                Remaining Hour
+            </th>
+            <th>
+                Is Completed?
+            </th>
 
-
-
-    </td>
-
-    <td>
-        @Html.DisplayFor(modelItem => item.DueDate)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.RemainingHour)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.IsCompleted)
-    </td>
-
-    <td>
-        @if (!item.IsCompleted)
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Result)
         {
 
-<a asp-action="Complete" asp-route-id="@item.Id" asp-route-showall="Model.ShowAll" onclick="return confirm('Are you sure to complete &quot;@item.Title&quot; task ? You can not change again!')">Complete</a>}
+
+    @if (item.IsCompleted)
+    {
+    <tr style="background-color:blue">
+        <td>
+
+            @Html.DisplayFor(modelItem => item.Category.Name)
 
 
-        | <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
-    </td>
-</tr>}
-        </tbody>
+        </td>
+        <td>
+            @if (item.IsCompleted)
+            {<del>@Html.DisplayFor(modelItem => item.Title)</del>}
+            @if (!item.IsCompleted)
+            {@Html.DisplayFor(modelItem => item.Title)}
+
+
+
+        </td>
+
+        <td>
+            @Html.DisplayFor(modelItem => item.DueDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.RemainingHour)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsCompleted)
+        </td>
+
+        <td>
+            @if (!item.IsCompleted)
+            {
+
+
+
+    <a asp-action="Complete" asp-route-id="@item.Id" asp-route-showall="Model.ShowAll" onclick="return confirm('Are you sure to complete &quot;@item.Title&quot; task ? You can not change again!')">Complete</a>}
+
+
+            | <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+            <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
+        </td>
+    </tr> }
+                    else
+                    {
+    @if (item.RemainingHour < 0)
+    {
+    <tr style="background-color:red">
+
+        <td>
+
+            @Html.DisplayFor(modelItem => item.Category.Name)
+
+
+        </td>
+        <td>
+            @if (item.IsCompleted)
+            {<del>@Html.DisplayFor(modelItem => item.Title)</del>}
+            @if (!item.IsCompleted)
+            {@Html.DisplayFor(modelItem => item.Title)}
+
+
+
+        </td>
+
+        <td>
+            @Html.DisplayFor(modelItem => item.DueDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.RemainingHour)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsCompleted)
+        </td>
+
+        <td>
+            @if (!item.IsCompleted)
+            {
+
+    <a asp-action="Complete" asp-route-id="@item.Id" asp-route-showall="Model.ShowAll" onclick="return confirm('Are you sure to complete &quot;@item.Title&quot; task ? You can not change again!')">Complete</a>}
+
+
+            | <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+            <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
+        </td>
+    </tr> }
+                        else if (item.RemainingHour < 24)
+                        {
+    <tr style="background-color: orange">
+
+        <td>
+
+            @Html.DisplayFor(modelItem => item.Category.Name)
+
+
+        </td>
+        <td>
+            @if (item.IsCompleted)
+            {<del>@Html.DisplayFor(modelItem => item.Title)</del>}
+            @if (!item.IsCompleted)
+            {@Html.DisplayFor(modelItem => item.Title)}
+
+
+
+        </td>
+
+        <td>
+            @Html.DisplayFor(modelItem => item.DueDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.RemainingHour)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsCompleted)
+        </td>
+
+        <td>
+            @if (!item.IsCompleted)
+            {
+
+    <a asp-action="Complete" asp-route-id="@item.Id" asp-route-showall="Model.ShowAll" onclick="return confirm('Are you sure to complete &quot;@item.Title&quot; task ? You can not change again!')">Complete</a>}
+
+
+            | <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+            <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
+        </td>
+    </tr>
+}
+else
+{
+    <tr style="background-color:lightblue">
+
+        <td>
+
+            @Html.DisplayFor(modelItem => item.Category.Name)
+
+
+        </td>
+        <td>
+            @if (item.IsCompleted)
+            {<del>@Html.DisplayFor(modelItem => item.Title)</del>}
+            @if (!item.IsCompleted)
+            {@Html.DisplayFor(modelItem => item.Title)}
+
+
+
+        </td>
+
+        <td>
+            @Html.DisplayFor(modelItem => item.DueDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.RemainingHour)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsCompleted)
+        </td>
+
+        <td>
+            @if (!item.IsCompleted)
+            {
+
+    <a asp-action="Complete" asp-route-id="@item.Id" asp-route-showall="Model.ShowAll" onclick="return confirm('Are you sure to complete &quot;@item.Title&quot; task ? You can not change again!')">Complete</a>}
+
+
+            | <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+            <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
+        </td>
+    </tr>
+}
+    }
+        }
+
+
+    </tbody>
     </table>

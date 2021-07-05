@@ -33,10 +33,14 @@ namespace cet322finaltodo.Controllers
             {
                 var firmUser = await firmManager.GetUserAsync(HttpContext.User);
                 var query = dbContext.todoItems
-                    .Include(t => t.Category)
-                    .Where(t => t.FirmUserId == firmUser.Id && !t.IsCompleted)
-                    .OrderBy(t => t.DueDate)
-                    .Take(3);
+                    .Include(t => t.Category).AsQueryable();
+                if (firmUser.Crew != "4DM1NU53R")
+                {
+                    query = query.Where(t => t.Category.Name == firmUser.Crew && !t.IsCompleted).AsQueryable();
+                }
+               
+                    query = query.Where(t=> !t.IsCompleted).Where(t=> t.DueDate>=DateTime.Now).OrderBy(t => t.DueDate )
+                    .Take(5);
                 result = await query.ToListAsync();
 
             }

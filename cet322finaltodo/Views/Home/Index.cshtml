@@ -3,84 +3,172 @@
 @{
     ViewData["Title"] = "Home Page";
 }
+
 <div class="text-center">
     <h1 class="display-4">Jobs Do It!</h1>
 </div>
 @if (User.Identity.IsAuthenticated)
 {
-@if (!Model.Any())
-{
+    @if (!Model.Any())
+    {
 
 
-<div class="text-center">
-        <h1 class="display-4">You don't have any tast to do!</h1>
-    </div> }
-else
-{
-    <table class="table">
-        <thead>
+        <div class="text-center">
+            <h1 class="display-4">You don't have any tast to do!</h1>
+        </div> }
+    else
+    {
+        <table class="table">
+            <thead>
 
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Category)
-                </th>
-                <th>
-                    <a>Status</a>
-                </th>
-
-                <th>
-                    @Html.DisplayNameFor(model => model.Title)
-                </th>
-
-                <th>
-                    @Html.DisplayNameFor(model => model.RemainingHour)
-                </th>
-
-
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
                 <tr>
-                    <td>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Category)
+                    </th>
+                    <th>
+                        <a>Status</a>
+                    </th>
 
-                        @Html.DisplayFor(modelItem => item.Category.Name)
+                    <th>
+                        @Html.DisplayNameFor(model => model.Title)
+                    </th>
 
-
-                    </td>
-                    <td>
-
-
-                        @if (item.RemainingHour < 0)
-                        {
-                            <a>Should Be DONE</a>
-                        }
-                        else if (item.RemainingHour < 24)
-                        {<a>LAST DAY</a>}
-                        else if (item.RemainingHour < 168)
-                        {<a>LAST WEEK</a>}
-                        else
-                        {
-                            <a>On going..</a>
-                        }
+                    <th>
+                        @Html.DisplayNameFor(model => model.RemainingHour)
+                    </th>
 
 
-
-                    </td>
-
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Title)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.RemainingHour)
-                    </td>
-
+                    <th></th>
                 </tr>
-            }
-        </tbody>
-    </table>
-}
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+
+                    @if (item.RemainingHour < 0)
+                    {
+
+                        <tr style="background-color:red">
+                            <td>
+
+                                @Html.DisplayFor(modelItem => item.Category.Name)
+
+
+                            </td>
+
+                            <td>
+
+
+                                @if (item.RemainingHour < 0)
+                                {
+                                    <a>Should Be DONE</a>
+                                }
+                                else if (item.RemainingHour < 24)
+                                {<a>LAST DAY</a>}
+                                else if (item.RemainingHour < 168)
+                                {<a>LAST WEEK</a>}
+                                else
+                                {
+                                    <a>On going..</a>
+                                }
+
+
+
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Title)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.RemainingHour)
+                            </td>
+
+                        </tr>
+
+                    }
+                    else if (item.RemainingHour < 24)
+                    {
+            <tr style="background-color:orange">
+                <td>
+
+                    @Html.DisplayFor(modelItem => item.Category.Name)
+
+
+                </td>
+
+                <td>
+
+
+                    @if (item.RemainingHour < 0)
+                    {
+                        <a>Should Be DONE</a>
+                    }
+                    else if (item.RemainingHour < 24)
+                    {<a>LAST DAY</a>}
+                    else if (item.RemainingHour < 168)
+                    {<a>LAST WEEK</a>}
+                    else
+                    {
+                        <a>On going..</a>
+                    }
+
+
+
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.RemainingHour)
+                </td>
+
+            </tr>
+                    }
+                    else
+                    {
+            <tr style="background-color:green">
+                <td>
+
+                    @Html.DisplayFor(modelItem => item.Category.Name)
+
+
+                </td>
+
+                <td>
+
+
+                    @if (item.RemainingHour < 0)
+                    {
+                        <a>Should Be DONE</a>
+                    }
+                    else if (item.RemainingHour < 24)
+                    {<a>LAST DAY</a>}
+                    else if (item.RemainingHour < 168)
+                    {<a>LAST WEEK</a>}
+                    else
+                    {
+                        <a>On going..</a>
+                    }
+
+
+
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.RemainingHour)
+                </td>
+
+            </tr>
+                    }
+                   
+
+                }
+            </tbody>
+        </table>
+    }
 
 }

@@ -29,7 +29,15 @@ namespace cet322finaltodo.Controllers
         public async Task<IActionResult> Index(SearchViewModel searchModel)
         {
             var firmUser = await _firmManager.GetUserAsync(HttpContext.User);
-            var query = _context.todoItems.Include(t => t.Category).Where(t=>t.FirmUserId == firmUser.Id).AsQueryable();
+            
+            var query = _context.todoItems.Include(t => t.Category).AsQueryable();
+            if(firmUser.Crew != "4DM1NU53R")
+            {
+                query = query.Where(t => t.Category.Name == firmUser.Crew).AsQueryable();
+            }
+            
+            
+           
             if (!searchModel.ShowAll)
             {
                 query = query.Where(t => !t.IsCompleted);
@@ -53,23 +61,21 @@ namespace cet322finaltodo.Controllers
             }
             var oldTodo = await _context.todoItems.FindAsync(id);
             var currentUser = await _firmManager.GetUserAsync(HttpContext.User);
-            if (oldTodo.FirmUserId != currentUser.Id)
-            {
-                return Unauthorized();
-
-            }
-
-
-            var todoItem = await _context.todoItems
+            
+                var todoItem = await _context.todoItems
                 .Include(t => t.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (todoItem == null)
-            {
-                return NotFound();
-            }
+                if (todoItem == null)
+                {
+                    return NotFound();
+                }
 
-            return View(todoItem);
+                return View(todoItem);
+           
+
+
+            
         }
 
         // GET: TodoItems/Create
@@ -89,42 +95,60 @@ namespace cet322finaltodo.Controllers
         public async Task<IActionResult> Create([Bind("Id,Title,Description,IsCompleted,DueDate,CategoryId,CreatedDate,FirmUser")] TodoItem todoItem)
         {
             var firmUser = await _firmManager.GetUserAsync(HttpContext.User);
-
-            todoItem.FirmUserId = firmUser.Id;
-            if (ModelState.IsValid)
+            
+            
+            if(firmUser.Crew == "4DM1NU53R")
             {
-                _context.Add(todoItem);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    _context.Add(todoItem);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", todoItem.CategoryId);
+                return View(todoItem);
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", todoItem.CategoryId);
-            return View(todoItem);
+            else
+            {
+                return BadRequest();
+            }
+
         }
+            
 
         // GET: TodoItems/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            var firmUser = await _firmManager.GetUserAsync(HttpContext.User);
+            if (firmUser.Crew == "4DM1NU53R")
             {
-                return NotFound();
+
+                if (id == null)
+                {
+                    return NotFound();
+                }
+
+                var todoItem = await _context.todoItems.FindAsync(id);
+
+
+                var currentUser = await _firmManager.GetUserAsync(HttpContext.User);
+                if(currentUser.Crew != "4DM1NU53R")
+                {
+                    return Unauthorized();
+
+                }
+
+                if (todoItem == null)
+                {
+                    return NotFound();
+                }
+                ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", todoItem.CategoryId);
+                return View(todoItem);
             }
-
-            var todoItem = await _context.todoItems.FindAsync(id);
-
-           
-            var currentUser = await _firmManager.GetUserAsync(HttpContext.User);
-            if (todoItem.FirmUserId != currentUser.Id)
+            else
             {
                 return Unauthorized();
-
             }
-
-            if (todoItem == null)
-            {
-                return NotFound();
-            }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", todoItem.CategoryId);
-            return View(todoItem);
         }
 
         // POST: TodoItems/Edit/5
@@ -134,7 +158,10 @@ namespace cet322finaltodo.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,IsCompleted,DueDate,CategoryId")] TodoItem todoItem)
         {
-            if (id != todoItem.Id)
+            var firmUser = await _firmManager.GetUserAsync(HttpContext.User);
+            if (firmUser.Crew == "4DM1NU53R")
+            {
+                if (id != todoItem.Id)
             {
                 return NotFound();
             }
@@ -145,21 +172,27 @@ namespace cet322finaltodo.Controllers
                 {
                     var oldTodo = await _context.todoItems.FindAsync(id);
                     var currentUser = await _firmManager.GetUserAsync(HttpContext.User);
-                    if(oldTodo.FirmUserId != currentUser.Id)
+                    if(oldTodo.Category.Name == currentUser.Crew || currentUser.Crew == "4DM1NU53R")
                     {
-                        return Unauthorized();
+                            oldTodo.Title = todoItem.Title;
+                            oldTodo.CompletedDate = todoItem.CompletedDate;
+                            oldTodo.DueDate = todoItem.DueDate;
+                            oldTodo.CategoryId = todoItem.CategoryId;
+                            oldTodo.Description = todoItem.Description;
+                            oldTodo.IsCompleted = todoItem.IsCompleted;
+                            _context.Update(oldTodo);
+                            await _context.SaveChangesAsync();
 
+                        }
+                        else
+                        {
+
+                        }
+
+             
+
+                        
                     }
-
-                    oldTodo.Title = todoItem.Title;
-                    oldTodo.CompletedDate = todoItem.CompletedDate;
-                    oldTodo.DueDate = todoItem.DueDate;
-                    oldTodo.CategoryId = todoItem.CategoryId;
-                    oldTodo.Description = todoItem.Description;
-                    oldTodo.IsCompleted = todoItem.IsCompleted;
-                    _context.Update(oldTodo);
-                    await _context.SaveChangesAsync();
-                }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!TodoItemExists(todoItem.Id))
@@ -175,12 +208,20 @@ namespace cet322finaltodo.Controllers
             }
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", todoItem.CategoryId);
             return View(todoItem);
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         // GET: TodoItems/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            var firmUser = await _firmManager.GetUserAsync(HttpContext.User);
+            if (firmUser.Crew == "4DM1NU53R")
+            {
+                if (id == null)
             {
                 return NotFound();
             }
@@ -194,6 +235,11 @@ namespace cet322finaltodo.Controllers
             }
 
             return View(todoItem);
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         // POST: TodoItems/Delete/5
@@ -201,15 +247,32 @@ namespace cet322finaltodo.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var todoItem = await _context.todoItems.FindAsync(id);
+            var firmUser = await _firmManager.GetUserAsync(HttpContext.User);
+            if (firmUser.Crew == "4DM1NU53R")
+            {
+                var todoItem = await _context.todoItems.FindAsync(id);
             _context.todoItems.Remove(todoItem);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                return Unauthorized();
+            }
+
         }
 
         public async Task<IActionResult> Complete(int id, bool currentShowAllValue)
         {
+            var firmUser = await _firmManager.GetUserAsync(HttpContext.User);
             var todoItemItem = _context.todoItems.FirstOrDefault(todo => todo.Id == id);
+            if( firmUser.Crew == "4DM1NU53R")
+            {
+                return Unauthorized();
+            }
+            else if (firmUser.Crew == todoItemItem.Category.Name)
+            {
+                
             if (todoItemItem == null)
             {
                 return NotFound();
@@ -218,6 +281,12 @@ namespace cet322finaltodo.Controllers
             todoItemItem.CompletedDate = DateTime.Now;
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index), new { showall = currentShowAllValue});
+            }
+            else
+            {
+                return Unauthorized();
+            }
+
 
         }
 

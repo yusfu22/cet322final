@@ -7,23 +7,35 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using cet322finaltodo.Data;
 using cet322finaltodo.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace cet322finaltodo.Controllers
 {
     public class FinishedTaskController : Controller
     {
+      
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<FirmUser> _firmManager;
 
-        public FinishedTaskController(ApplicationDbContext context)
+        public FinishedTaskController(ApplicationDbContext context, UserManager<FirmUser> firmManager)
         {
             _context = context;
+            _firmManager = firmManager;
         }
 
         // GET: FinishedTask
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.todoItems.Include(t => t.Category);
-            return View(await applicationDbContext.ToListAsync());
+            var firmUser = await _firmManager.GetUserAsync(HttpContext.User);
+            if (firmUser.Crew == "4DM1NU53R")
+            {
+                var applicationDbContext = _context.todoItems.Include(t => t.Category);
+                return View(await applicationDbContext.ToListAsync());
+
+            }else return Unauthorized();
+
+
         }
 
         // GET: FinishedTask/Details/5

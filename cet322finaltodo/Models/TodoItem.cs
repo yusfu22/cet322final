@@ -45,5 +45,7 @@ namespace cet322finaltodo.Models
 
         public string FirmUserId { get; set; }
         public virtual FirmUser FirmUser { get; set; }
+
+
     }
 }
